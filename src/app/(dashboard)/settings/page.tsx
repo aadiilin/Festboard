@@ -8,7 +8,6 @@ import { Select } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { createClient } from "@/lib/supabase/client"
 import { useAuth } from "@/hooks/useAuth"
-import { DEFAULT_POINT_SYSTEM } from "@/lib/constants"
 import toast from "react-hot-toast"
 import type { Event, PointSystem } from "@/types"
 

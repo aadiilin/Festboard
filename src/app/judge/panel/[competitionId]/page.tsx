@@ -42,8 +42,8 @@ export default function JudgePanelPage() {
         .eq("competition_id", params.competitionId)
         .eq("judge_id", user?.id)
       if (existingScores) {
-        const scoreMap: Record<string, any> = {}
-        existingScores.forEach(s => {
+        const scoreMap: Record<string, { marks: string; is_draft: boolean; is_approved: boolean }> = {}
+        existingScores.forEach((s: { participant_id: string; marks: number; is_draft: boolean; is_approved: boolean }) => {
           scoreMap[s.participant_id] = { marks: String(s.marks), is_draft: s.is_draft, is_approved: s.is_approved }
         })
         setScores(scoreMap)

@@ -31,8 +31,7 @@ export default function CertificatesPage() {
       .from("certificates")
       .select("*, participant:participant_id(name), competition:competition_id(name)")
       .eq("event_id", selectedEvent)
-      .returns<any>()
-    if (data) setCertificates(data.map((d: any) => ({ ...d, participant_name: d.participant?.name, comp_name: d.competition?.name })))
+    if (data) setCertificates((data as any[]).map((d: any) => ({ ...d, participant_name: d.participant?.name, comp_name: d.competition?.name })))
   }
 
   const typeVariant: Record<string, "default" | "success" | "secondary"> = {

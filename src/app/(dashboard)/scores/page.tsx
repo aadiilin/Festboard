@@ -38,8 +38,7 @@ export default function ScoresPage() {
       .from("scores")
       .select("*, participant:participant_id(name)")
       .eq("competition_id", selectedComp)
-      .returns<any>()
-    if (data) setScores(data.map((d: any) => ({ ...d, participant_name: d.participant?.name })))
+    if (data) setScores((data as any[]).map((d: any) => ({ ...d, participant_name: d.participant?.name })))
   }
 
   const approveScore = async (id: string) => {

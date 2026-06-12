@@ -34,9 +34,8 @@ export default function StudentDashboardPage() {
         .select("*, competition:competition_id(name)")
         .eq("participant_id", participant.id)
         .eq("is_approved", true)
-        .returns<any>()
         .then(({ data }) => {
-          if (data) setScores(data.map((d: any) => ({ ...d, comp_name: d.competition?.name })))
+          if (data) setScores((data as any[]).map((d: any) => ({ ...d, comp_name: d.competition?.name })))
         })
     }
   }, [participant])

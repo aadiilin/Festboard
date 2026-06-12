@@ -37,8 +37,7 @@ export default function JudgesPage() {
     const { data } = await supabase
       .from("competition_judges")
       .select("*, judge:judge_id(full_name), competition:competition_id(name)")
-      .returns<any>()
-    if (data) setAssignedJudges(data.map((d: any) => ({ ...d, judge_name: d.judge?.full_name, comp_name: d.competition?.name })))
+    if (data) setAssignedJudges((data as any[]).map((d: any) => ({ ...d, judge_name: d.judge?.full_name, comp_name: d.competition?.name })))
   }
 
   const assignJudge = async () => {

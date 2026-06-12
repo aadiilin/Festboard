@@ -43,11 +43,10 @@ export default function ResultsPage() {
           .select("*, competition:competition_id(name)")
           .eq("participant_id", p.id)
           .eq("is_approved", true)
-          .returns<any>()
 
         return {
           ...p,
-          scores: scores?.map((s: any) => ({ marks: s.marks, competition: s.competition?.name })) || [],
+          scores: (scores as any[])?.map((s: any) => ({ marks: s.marks, competition: s.competition?.name })) || [],
         }
       })
     )

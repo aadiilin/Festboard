@@ -20,11 +20,10 @@ export default function JudgeHomePage() {
         .from("competition_judges")
         .select("competition:competition_id(*, event:event_id(name))")
         .eq("judge_id", user.id)
-        .returns<any>()
         .then(({ data }) => {
           if (data) {
             setCompetitions(
-              data.map((d: any) => ({
+              (data as any[]).map((d: any) => ({
                 ...d.competition,
                 event_name: d.competition?.event?.name,
               }))
