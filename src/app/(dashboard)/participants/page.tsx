@@ -14,8 +14,10 @@ import { generateChestNumber, getCategoryPrefix } from "@/lib/utils"
 import toast from "react-hot-toast"
 import type { Event, Category, Team, Participant } from "@/types"
 
+type Gender = "male" | "female" | "other"
+
 interface ParticipantForm {
-  name: string; gender: "male" | "female" | "other"; category_id: string; team_id: string; mobile: string; email: string; address: string
+  name: string; gender: Gender; category_id: string; team_id: string; mobile: string; email: string; address: string
 }
 
 export default function ParticipantsPage() {
@@ -27,7 +29,7 @@ export default function ParticipantsPage() {
   const [search, setSearch] = useState("")
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState<Participant | null>(null)
-  const [form, setForm] = useState<ParticipantForm>({ name: "", gender: "" as "male" | "female" | "other", category_id: "", team_id: "", mobile: "", email: "", address: "" })
+  const [form, setForm] = useState<ParticipantForm>({ name: "", gender: "" as Gender, category_id: "", team_id: "", mobile: "", email: "", address: "" })
   const supabase = createClient()
 
   useEffect(() => {
@@ -70,7 +72,7 @@ export default function ParticipantsPage() {
     if (error) toast.error(error.message)
     else {
       toast.success(editing ? "Updated" : "Added")
-      setOpen(false); setEditing(null); setForm({ name: "", gender: "" as "male" | "female" | "other", category_id: "", team_id: "", mobile: "", email: "", address: "" })
+      setOpen(false); setEditing(null); setForm({ name: "", gender: "" as Gender, category_id: "", team_id: "", mobile: "", email: "", address: "" })
       loadParticipants()
     }
   }
@@ -103,7 +105,7 @@ export default function ParticipantsPage() {
               </Select>
               <Input placeholder="Full name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
               <div className="grid grid-cols-2 gap-3">
-                <Select value={form.gender} onChange={(e) => setForm({ ...form, gender: e.target.value as "male" | "female" | "other" })}>
+                <Select value={form.gender} onChange={(e) => setForm({ ...form, gender: e.target.value as Gender })}>
                   <option value="male">Male</option><option value="female">Female</option><option value="other">Other</option>
                 </Select>
                 <Select value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })}>
@@ -163,7 +165,7 @@ export default function ParticipantsPage() {
                     <TableCell>{p.mobile || "-"}</TableCell>
                     <TableCell>
                       <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => { setEditing(p); setForm({ name: p.name, gender: p.gender as "male" | "female" | "other", category_id: p.category_id, team_id: p.team_id || "", mobile: p.mobile || "", email: p.email || "", address: p.address || "" }); setOpen(true) }}>
+                        <Button variant="ghost" size="icon" onClick={() => { setEditing(p); const g: Gender = p.gender as Gender; setForm({ name: p.name, gender: g, category_id: p.category_id, team_id: p.team_id || "", mobile: p.mobile || "", email: p.email || "", address: p.address || "" }); setOpen(true) }}>
                           <Pencil className="h-4 w-4" />
                         </Button>
                         <Button variant="ghost" size="icon" onClick={() => deleteParticipant(p.id)}>
