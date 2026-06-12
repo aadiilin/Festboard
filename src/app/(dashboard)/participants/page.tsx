@@ -14,6 +14,10 @@ import { generateChestNumber, getCategoryPrefix } from "@/lib/utils"
 import toast from "react-hot-toast"
 import type { Event, Category, Team, Participant } from "@/types"
 
+interface ParticipantForm {
+  name: string; gender: "male" | "female" | "other"; category_id: string; team_id: string; mobile: string; email: string; address: string
+}
+
 export default function ParticipantsPage() {
   const [events, setEvents] = useState<Event[]>([])
   const [categories, setCategories] = useState<Category[]>([])
@@ -23,7 +27,7 @@ export default function ParticipantsPage() {
   const [search, setSearch] = useState("")
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState<Participant | null>(null)
-  const [form, setForm] = useState({ name: "", gender: "" as "male" | "female" | "other", category_id: "", team_id: "", mobile: "", email: "", address: "" })
+  const [form, setForm] = useState<ParticipantForm>({ name: "", gender: "" as "male" | "female" | "other", category_id: "", team_id: "", mobile: "", email: "", address: "" })
   const supabase = createClient()
 
   useEffect(() => {
