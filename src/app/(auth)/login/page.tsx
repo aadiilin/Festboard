@@ -23,7 +23,7 @@ export default function LoginPage() {
     const error = await signIn(email, password)
     setLoading(false)
     if (error) toast.error(error)
-    else router.push("/dashboard")
+    else router.push("/")
   }
 
   const handleMagicLink = async () => {
