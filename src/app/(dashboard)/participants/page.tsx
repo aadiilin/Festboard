@@ -29,7 +29,7 @@ export default function ParticipantsPage() {
   const [search, setSearch] = useState("")
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState<Participant | null>(null)
-  const [form, setForm] = useState<ParticipantForm>({ name: "", gender: "" as Gender, category_id: "", team_id: "", mobile: "", email: "", address: "" })
+  const [form, setForm] = useState<ParticipantForm>({ name: "", gender: "male", category_id: "", team_id: "", mobile: "", email: "", address: "" })
   const supabase = createClient()
 
   useEffect(() => {
@@ -64,7 +64,17 @@ export default function ParticipantsPage() {
     const count = participants.filter(p => p.category_id === form.category_id).length
     const chest = generateChestNumber(prefix, count)
 
-    const payload = { event_id: selectedEvent, chest_number: chest, ...form }
+    const payload = {
+      event_id: selectedEvent,
+      chest_number: chest,
+      name: form.name,
+      gender: form.gender,
+      category_id: form.category_id,
+      team_id: form.team_id || null,
+      mobile: form.mobile || null,
+      email: form.email || null,
+      address: form.address || null,
+    }
     const { error } = editing
       ? await supabase.from("participants").update(payload).eq("id", editing.id)
       : await supabase.from("participants").insert(payload)
@@ -72,7 +82,7 @@ export default function ParticipantsPage() {
     if (error) toast.error(error.message)
     else {
       toast.success(editing ? "Updated" : "Added")
-      setOpen(false); setEditing(null); setForm({ name: "", gender: "" as Gender, category_id: "", team_id: "", mobile: "", email: "", address: "" })
+      setOpen(false); setEditing(null); setForm({ name: "", gender: "male", category_id: "", team_id: "", mobile: "", email: "", address: "" })
       loadParticipants()
     }
   }
@@ -165,7 +175,7 @@ export default function ParticipantsPage() {
                     <TableCell>{p.mobile || "-"}</TableCell>
                     <TableCell>
                       <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => { setEditing(p); const g: Gender = p.gender as Gender; setForm({ name: p.name, gender: g, category_id: p.category_id, team_id: p.team_id || "", mobile: p.mobile || "", email: p.email || "", address: p.address || "" }); setOpen(true) }}>
+                        <Button variant="ghost" size="icon" onClick={() => { setEditing(p); setForm({ name: p.name, gender: p.gender, category_id: p.category_id, team_id: p.team_id || "", mobile: p.mobile || "", email: p.email || "", address: p.address || "" }); setOpen(true) }}>
                           <Pencil className="h-4 w-4" />
                         </Button>
                         <Button variant="ghost" size="icon" onClick={() => deleteParticipant(p.id)}>
