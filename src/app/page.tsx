@@ -41,9 +41,6 @@ export default function HomePage() {
             <Link href="/login">
               <Button size="lg" className="gradient-primary">Get Started</Button>
             </Link>
-            <Link href="/register">
-              <Button size="lg" variant="outline">Create Account</Button>
-            </Link>
           </motion.div>
         </div>
       </section>
