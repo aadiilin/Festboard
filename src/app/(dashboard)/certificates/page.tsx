@@ -1,14 +1,13 @@
 "use client"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { createClient } from "@/lib/supabase/client"
 import { Download, Award } from "lucide-react"
-import toast from "react-hot-toast"
-import type { Event, Certificate, Participant, Competition } from "@/types"
+import type { Event, Certificate } from "@/types"
 
 export default function CertificatesPage() {
   const [events, setEvents] = useState<Event[]>([])
@@ -31,10 +30,13 @@ export default function CertificatesPage() {
       .from("certificates")
       .select("*, participant:participant_id(name), competition:competition_id(name)")
       .eq("event_id", selectedEvent)
-    if (data) setCertificates((data as any[]).map((d: any) => ({ ...d, participant_name: d.participant?.name, comp_name: d.competition?.name })))
+    if (data) {
+      type CertRow = Certificate & { participant?: { name: string } | null; competition?: { name: string } | null }
+      setCertificates(data.map((d: CertRow) => ({ ...d, participant_name: d.participant?.name, comp_name: d.competition?.name })))
+    }
   }
 
-  const typeVariant: Record<string, "default" | "success" | "secondary"> = {
+  const typeVariant: Record<Certificate["type"], "default" | "success" | "secondary"> = {
     winner: "success", runner_up: "default", participation: "secondary", merit: "default",
   }
 

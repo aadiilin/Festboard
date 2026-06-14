@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/client"
 import { Plus, Calendar, Copy, ExternalLink } from "lucide-react"
 import { formatDate } from "@/lib/utils"
 import toast from "react-hot-toast"
-import type { Event } from "@/types"
+import type { Event, EventStatus } from "@/types"
 
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([])
@@ -41,7 +41,7 @@ export default function EventsPage() {
     else { toast.success("Event duplicated!"); loadEvents() }
   }
 
-  const statusVariant: Record<string, "default" | "success" | "warning" | "secondary"> = {
+  const statusVariant: Record<EventStatus, "default" | "success" | "warning" | "secondary"> = {
     active: "success", draft: "secondary", completed: "default", cancelled: "warning",
   }
 

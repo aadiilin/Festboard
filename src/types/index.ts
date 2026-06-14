@@ -58,7 +58,7 @@ export interface Participant {
   team_id?: string;
   name: string;
   photo_url?: string;
-  gender: "male" | "female" | "other";
+  gender: string;
   chest_number: string;
   mobile?: string;
   email?: string;

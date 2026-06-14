@@ -1,13 +1,13 @@
 "use client"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { createClient } from "@/lib/supabase/client"
 import { CheckCircle2, Clock } from "lucide-react"
-import type { Event, Competition, Score, Participant } from "@/types"
+import type { Event, Competition, Score } from "@/types"
 
 export default function ScoresPage() {
   const [events, setEvents] = useState<Event[]>([])
@@ -38,7 +38,10 @@ export default function ScoresPage() {
       .from("scores")
       .select("*, participant:participant_id(name)")
       .eq("competition_id", selectedComp)
-    if (data) setScores((data as any[]).map((d: any) => ({ ...d, participant_name: d.participant?.name })))
+    if (data) {
+      type ScoreRow = Score & { participant?: { name: string } | null }
+      setScores(data.map((d: ScoreRow) => ({ ...d, participant_name: d.participant?.name })))
+    }
   }
 
   const approveScore = async (id: string) => {

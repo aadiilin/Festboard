@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select } from "@/components/ui/select"
 import { createClient } from "@/lib/supabase/client"
-import { Plus, GripVertical, Pencil, Trash2 } from "lucide-react"
+import { Plus, GripVertical, Trash2 } from "lucide-react"
 import toast from "react-hot-toast"
 import type { Event, Category } from "@/types"
 

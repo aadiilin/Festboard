@@ -24,17 +24,24 @@ export default function EditEventPage() {
     start_date: "", end_date: "", status: "draft" as Event["status"], languages: ["en"],
   })
 
+  const eventId = Array.isArray(params.id) ? params.id[0] : params.id
+
   useEffect(() => {
-    supabase.from("events").select("*").eq("id", params.id).single().then(({ data }) => {
-      if (data) setForm({ name: data.name, organization_name: data.organization_name, description: data.description || "", venue: data.venue || "", start_date: data.start_date, end_date: data.end_date, status: data.status, languages: data.languages })
+    if (eventId) {
+      supabase.from("events").select("*").eq("id", eventId).single().then(({ data }) => {
+        if (data) setForm({ name: data.name, organization_name: data.organization_name, description: data.description || "", venue: data.venue || "", start_date: data.start_date, end_date: data.end_date, status: data.status, languages: data.languages })
+        setFetching(false)
+      })
+    } else {
       setFetching(false)
-    })
-  }, [params.id])
+    }
+  }, [eventId])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!eventId) return
     setLoading(true)
-    const { error } = await supabase.from("events").update(form).eq("id", params.id)
+    const { error } = await supabase.from("events").update(form).eq("id", eventId)
     setLoading(false)
     if (error) toast.error(error.message)
     else { toast.success("Event updated!"); router.push("/dashboard/events") }

@@ -14,10 +14,8 @@ import { generateChestNumber, getCategoryPrefix } from "@/lib/utils"
 import toast from "react-hot-toast"
 import type { Event, Category, Team, Participant } from "@/types"
 
-type Gender = "male" | "female" | "other"
-
 interface ParticipantForm {
-  name: string; gender: Gender; category_id: string; team_id: string; mobile: string; email: string; address: string
+  name: string; gender: string; category_id: string; team_id: string; mobile: string; email: string; address: string
 }
 
 export default function ParticipantsPage() {
@@ -115,7 +113,7 @@ export default function ParticipantsPage() {
               </Select>
               <Input placeholder="Full name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
               <div className="grid grid-cols-2 gap-3">
-                <Select value={form.gender} onChange={(e) => setForm({ ...form, gender: e.target.value as Gender })}>
+                <Select value={form.gender} onChange={(e) => setForm({ ...form, gender: e.target.value })}>
                   <option value="male">Male</option><option value="female">Female</option><option value="other">Other</option>
                 </Select>
                 <Select value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })}>

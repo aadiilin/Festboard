@@ -2,14 +2,13 @@
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { createClient } from "@/lib/supabase/client"
-import { Plus, Pencil, Trash2, Search } from "lucide-react"
+import { Plus, Trash2, Search } from "lucide-react"
 import { formatDate, formatTime } from "@/lib/utils"
 import toast from "react-hot-toast"
 import type { Event, Category, Competition, Profile } from "@/types"
@@ -55,7 +54,7 @@ export default function CompetitionsPage() {
     toast.success("Deleted")
   }
 
-  const statusVariant: Record<string, "default" | "success" | "warning"> = { upcoming: "default", ongoing: "warning", completed: "success" }
+  const statusVariant: Record<Competition["status"], "default" | "success" | "warning"> = { upcoming: "default", ongoing: "warning", completed: "success" }
   const filtered = competitions.filter(c => c.name.toLowerCase().includes(search.toLowerCase()))
 
   return (

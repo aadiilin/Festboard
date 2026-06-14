@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select } from "@/components/ui/select"
 import { createClient } from "@/lib/supabase/client"
 import { Image, Upload } from "lucide-react"
-import toast from "react-hot-toast"
 import type { Event, Poster } from "@/types"
 
 export default function PostersPage() {

@@ -40,7 +40,8 @@ export default function SettingsPage() {
   }, [selectedEvent])
 
   const updateProfile = async () => {
-    const { error } = await supabase.from("profiles").update(profileForm).eq("id", profile?.id)
+    if (!profile) return toast.error("Profile not loaded")
+    const { error } = await supabase.from("profiles").update(profileForm).eq("id", profile.id)
     if (error) toast.error(error.message)
     else { toast.success("Profile updated"); refreshProfile() }
   }
