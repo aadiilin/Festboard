@@ -17,7 +17,7 @@ import {
   BarChart3,
   Settings,
   Download,
-  LogOut,
+  Building2,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react"
@@ -36,6 +36,7 @@ const navItems = [
   { href: "/dashboard/posters", label: "Posters", icon: Image },
   { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/dashboard/import-export", label: "Import/Export", icon: Download },
+  { href: "/dashboard/rentals", label: "Rentals", icon: Building2 },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ]
 

@@ -163,6 +163,21 @@ export interface AuditLog {
   created_at: string;
 }
 
+export type LoginType = "google" | "email_password" | "magic_link" | "none";
+export type TenantStatus = "active" | "expired" | "suspended";
+
+export interface Tenant {
+  id: string;
+  name: string;
+  domain: string;
+  login_type: LoginType;
+  rental_start: string;
+  rental_end: string;
+  status: TenantStatus;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface LeaderboardEntry {
   team_id: string;
   team_name: string;

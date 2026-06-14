@@ -1,6 +1,22 @@
 -- FestBoard Database Schema for Supabase
 -- Run this in the Supabase SQL Editor to set up your database
 
+-- 0. TENANTS TABLE (for site rental management)
+CREATE TABLE tenants (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  domain TEXT NOT NULL UNIQUE,
+  login_type TEXT NOT NULL DEFAULT 'google' CHECK (login_type IN ('google', 'email_password', 'magic_link', 'none')),
+  rental_start DATE NOT NULL DEFAULT CURRENT_DATE,
+  rental_end DATE NOT NULL,
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'expired', 'suspended')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE tenants ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "tenants_all" ON tenants FOR ALL USING (true);
+
 -- 1. PROFILES TABLE
 CREATE TABLE profiles (
   id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
