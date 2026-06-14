@@ -38,8 +38,11 @@ export default function HomePage() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="mt-10 flex items-center justify-center gap-4"
           >
-            <Link href="/dashboard">
-              <Button size="lg" className="gradient-primary">Go to Dashboard</Button>
+            <Link href="/login">
+              <Button size="lg" className="gradient-primary">Get Started</Button>
+            </Link>
+            <Link href="/register">
+              <Button size="lg" variant="outline">Create Account</Button>
             </Link>
           </motion.div>
         </div>

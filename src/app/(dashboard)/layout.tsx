@@ -12,7 +12,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   useEffect(() => {
-    if (!loading && !user) router.push("/")
+    if (!loading && !user) router.push("/login")
   }, [user, loading, router])
 
   if (loading) {

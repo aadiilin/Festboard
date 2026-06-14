@@ -10,7 +10,7 @@ export default function JudgeLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (!loading && (!user || !hasRole(profile, ["judge", "super_admin", "event_admin"])))
-      router.push("/")
+      router.push("/login")
   }, [user, profile, loading, router])
 
   if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>
