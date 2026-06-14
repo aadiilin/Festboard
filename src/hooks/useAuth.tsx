@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signInWithGoogle = async () => {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin
+    const baseUrl = window.location.origin
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
