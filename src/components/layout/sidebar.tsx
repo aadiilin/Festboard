@@ -20,37 +20,29 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
-  Languages,
 } from "lucide-react"
 import { useState } from "react"
-import { useAuth } from "@/hooks/useAuth"
-import type { Role } from "@/types"
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["super_admin", "event_admin", "judge"] },
-  { href: "/dashboard/events", label: "Events", icon: CalendarDays, roles: ["super_admin", "event_admin"] },
-  { href: "/dashboard/categories", label: "Categories", icon: Tags, roles: ["super_admin", "event_admin"] },
-  { href: "/dashboard/teams", label: "Teams", icon: Users, roles: ["super_admin", "event_admin"] },
-  { href: "/dashboard/participants", label: "Participants", icon: UserCircle, roles: ["super_admin", "event_admin"] },
-  { href: "/dashboard/competitions", label: "Competitions", icon: Trophy, roles: ["super_admin", "event_admin", "judge"] },
-  { href: "/dashboard/judges", label: "Judges", icon: Gavel, roles: ["super_admin", "event_admin"] },
-  { href: "/dashboard/scores", label: "Scores", icon: ScrollText, roles: ["super_admin", "event_admin", "judge"] },
-  { href: "/dashboard/certificates", label: "Certificates", icon: Award, roles: ["super_admin", "event_admin"] },
-  { href: "/dashboard/posters", label: "Posters", icon: Image, roles: ["super_admin", "event_admin"] },
-  { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3, roles: ["super_admin", "event_admin"] },
-  { href: "/dashboard/import-export", label: "Import/Export", icon: Download, roles: ["super_admin", "event_admin"] },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings, roles: ["super_admin", "event_admin"] },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard/events", label: "Events", icon: CalendarDays },
+  { href: "/dashboard/categories", label: "Categories", icon: Tags },
+  { href: "/dashboard/teams", label: "Teams", icon: Users },
+  { href: "/dashboard/participants", label: "Participants", icon: UserCircle },
+  { href: "/dashboard/competitions", label: "Competitions", icon: Trophy },
+  { href: "/dashboard/judges", label: "Judges", icon: Gavel },
+  { href: "/dashboard/scores", label: "Scores", icon: ScrollText },
+  { href: "/dashboard/certificates", label: "Certificates", icon: Award },
+  { href: "/dashboard/posters", label: "Posters", icon: Image },
+  { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/dashboard/import-export", label: "Import/Export", icon: Download },
+  { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ]
 
 export function Sidebar({ collapsed, onToggle }: { collapsed?: boolean; onToggle?: (val: boolean) => void }) {
   const pathname = usePathname()
   const [localCollapsed, setLocalCollapsed] = useState(false)
   const isCollapsed = collapsed ?? localCollapsed
-  const { profile, signOut } = useAuth()
-
-  if (!profile) return null
-
-  const filteredNav = navItems.filter((item) => item.roles.includes(profile.role as Role))
 
   return (
     <aside
@@ -67,7 +59,7 @@ export function Sidebar({ collapsed, onToggle }: { collapsed?: boolean; onToggle
       </div>
 
       <nav className="flex-1 overflow-y-auto p-2 space-y-1">
-        {filteredNav.map((item) => {
+        {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
           return (
             <Link key={item.href} href={item.href}>
@@ -95,14 +87,6 @@ export function Sidebar({ collapsed, onToggle }: { collapsed?: boolean; onToggle
         >
           {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           {!isCollapsed && <span className="text-sm">Collapse</span>}
-        </Button>
-        <Button
-          variant="ghost"
-          className="w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent"
-          onClick={signOut}
-        >
-          <LogOut className="h-4 w-4" />
-          {!isCollapsed && <span className="text-sm">Sign Out</span>}
         </Button>
       </div>
     </aside>

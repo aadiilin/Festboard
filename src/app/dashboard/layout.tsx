@@ -1,29 +1,10 @@
 "use client"
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { Sidebar } from "@/components/layout/sidebar"
 import { Header } from "@/components/layout/header"
-import { useAuth } from "@/hooks/useAuth"
-import { Loader2 } from "lucide-react"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth()
-  const router = useRouter()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-
-  useEffect(() => {
-    if (!loading && !user) router.push("/login")
-  }, [user, loading, router])
-
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    )
-  }
-
-  if (!user) return null
 
   return (
     <div className="flex min-h-screen">
