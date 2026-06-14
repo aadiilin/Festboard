@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { createClient } from "@/lib/supabase/client"
-import { useAuth } from "@/hooks/useAuth"
 import { ArrowLeft, Loader2 } from "lucide-react"
 import Link from "next/link"
 import toast from "react-hot-toast"
@@ -15,7 +14,6 @@ import type { Event } from "@/types"
 export default function EditEventPage() {
   const router = useRouter()
   const params = useParams()
-  const { user } = useAuth()
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)

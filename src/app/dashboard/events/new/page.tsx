@@ -6,14 +6,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { createClient } from "@/lib/supabase/client"
-import { useAuth } from "@/hooks/useAuth"
 import { ArrowLeft, Loader2 } from "lucide-react"
 import Link from "next/link"
 import toast from "react-hot-toast"
 
 export default function CreateEventPage() {
   const router = useRouter()
-  const { user } = useAuth()
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({
@@ -23,10 +21,9 @@ export default function CreateEventPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!user) return
     setLoading(true)
     const { error } = await supabase.from("events").insert({
-      user_id: user.id, name: form.name, organization_name: form.organization_name,
+      name: form.name, organization_name: form.organization_name,
       description: form.description, venue: form.venue,
       start_date: form.start_date, end_date: form.end_date,
       languages: form.languages, status: "draft",

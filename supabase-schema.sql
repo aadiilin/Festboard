@@ -33,7 +33,7 @@ CREATE TABLE profiles (
 -- 2. EVENTS TABLE
 CREATE TABLE events (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+  user_id UUID, -- nullable now — auth removed
   name TEXT NOT NULL,
   organization_name TEXT NOT NULL,
   logo_url TEXT,
@@ -222,70 +222,48 @@ CREATE INDEX idx_competition_judges_judge_id ON competition_judges(judge_id);
 CREATE INDEX idx_certificates_event_id ON certificates(event_id);
 CREATE INDEX idx_certificates_participant_id ON certificates(participant_id);
 
--- ENABLE ROW LEVEL SECURITY
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+-- ENABLE ROW LEVEL SECURITY (all public — auth removed)
 ALTER TABLE events ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "events_public_all" ON events FOR ALL USING (true);
+
 ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "categories_public_all" ON categories FOR ALL USING (true);
+
 ALTER TABLE teams ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "teams_public_all" ON teams FOR ALL USING (true);
+
 ALTER TABLE participants ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "participants_public_all" ON participants FOR ALL USING (true);
+
 ALTER TABLE competitions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "competitions_public_all" ON competitions FOR ALL USING (true);
+
 ALTER TABLE competition_judges ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "judges_public_all" ON competition_judges FOR ALL USING (true);
+
 ALTER TABLE scores ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "scores_public_all" ON scores FOR ALL USING (true);
+
 ALTER TABLE point_systems ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "pointsystems_public_all" ON point_systems FOR ALL USING (true);
+
 ALTER TABLE penalties ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "penalties_public_all" ON penalties FOR ALL USING (true);
+
 ALTER TABLE penalty_logs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "penaltylogs_public_all" ON penalty_logs FOR ALL USING (true);
+
 ALTER TABLE certificates ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "certificates_public_all" ON certificates FOR ALL USING (true);
+
 ALTER TABLE posters ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "posters_public_all" ON posters FOR ALL USING (true);
+
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "auditlogs_public_all" ON audit_logs FOR ALL USING (true);
+
 ALTER TABLE event_settings ENABLE ROW LEVEL SECURITY;
-
--- RLS POLICIES
-
--- Profiles: users can read their own profile, admins can read all
-CREATE POLICY "Users can view own profile" ON profiles FOR SELECT USING (auth.uid() = id);
-CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
-
--- Events: event admin can CRUD their own events, super admin can all
-CREATE POLICY "Event admins manage own events" ON events FOR ALL USING (auth.uid() = user_id);
-CREATE POLICY "Super admins manage all events" ON events FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'super_admin')
-);
-
--- Categories: event admin can manage categories for their events
-CREATE POLICY "Manage categories" ON categories FOR ALL USING (
-  EXISTS (SELECT 1 FROM events WHERE id = categories.event_id AND user_id = auth.uid())
-  OR EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'super_admin')
-);
-
--- Teams: event admin can manage teams
-CREATE POLICY "Manage teams" ON teams FOR ALL USING (
-  EXISTS (SELECT 1 FROM events WHERE id = teams.event_id AND user_id = auth.uid())
-  OR EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'super_admin')
-);
-
--- Participants: event admin can CRUD, judges can read
-CREATE POLICY "Manage participants" ON participants FOR ALL USING (
-  EXISTS (SELECT 1 FROM events WHERE id = participants.event_id AND user_id = auth.uid())
-  OR EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'super_admin')
-);
-
--- Competitions: event admin manages, judges can read assigned
-CREATE POLICY "Manage competitions" ON competitions FOR ALL USING (
-  EXISTS (SELECT 1 FROM events WHERE id = competitions.event_id AND user_id = auth.uid())
-  OR EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'super_admin')
-);
-
--- Scores: judges can insert/update their own scores, event admin can approve
-CREATE POLICY "Judges manage own scores" ON scores FOR ALL USING (judge_id = auth.uid());
-CREATE POLICY "Admins approve scores" ON scores FOR UPDATE USING (
-  EXISTS (SELECT 1 FROM competitions c JOIN events e ON c.event_id = e.id WHERE c.id = scores.competition_id AND e.user_id = auth.uid())
-  OR EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'super_admin')
-);
-
--- Public read access for results view
-CREATE POLICY "Public view scores" ON scores FOR SELECT USING (is_approved = TRUE);
-CREATE POLICY "Public view participants" ON participants FOR SELECT USING (TRUE);
-CREATE POLICY "Public view events" ON events FOR SELECT USING (status = 'active');
+CREATE POLICY "eventsettings_public_all" ON event_settings FOR ALL USING (true);
 
 -- TRIGGER to create profile on signup
 CREATE OR REPLACE FUNCTION handle_new_user()
