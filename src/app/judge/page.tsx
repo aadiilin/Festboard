@@ -4,34 +4,28 @@ import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Select } from "@/components/ui/select"
 import { createClient } from "@/lib/supabase/client"
-import { useAuth } from "@/hooks/useAuth"
 import { Gavel, ExternalLink } from "lucide-react"
-import type { Competition } from "@/types"
+import type { Event, Competition } from "@/types"
 
 export default function JudgeHomePage() {
-  const { user, profile } = useAuth()
   const supabase = createClient()
-  const [competitions, setCompetitions] = useState<(Competition & { event_name?: string })[]>([])
+  const [events, setEvents] = useState<Event[]>([])
+  const [selectedEvent, setSelectedEvent] = useState("")
+  const [competitions, setCompetitions] = useState<Competition[]>([])
 
   useEffect(() => {
-    if (user) {
-      supabase
-        .from("competition_judges")
-        .select("competition:competition_id(*, event:event_id(name))")
-        .eq("judge_id", user.id)
-        .then(({ data }) => {
-          if (data) {
-            setCompetitions(
-              (data as any[]).map((d: any) => ({
-                ...d.competition,
-                event_name: d.competition?.event?.name,
-              }))
-            )
-          }
-        })
+    supabase.from("events").select("*").order("created_at", { ascending: false }).then(({ data }) => {
+      if (data) { setEvents(data); if (data[0]) setSelectedEvent(data[0].id) }
+    })
+  }, [])
+
+  useEffect(() => {
+    if (selectedEvent) {
+      supabase.from("competitions").select("*").eq("event_id", selectedEvent).then(({ data }) => data && setCompetitions(data))
     }
-  }, [user])
+  }, [selectedEvent])
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">
@@ -39,15 +33,22 @@ export default function JudgeHomePage() {
         <Gavel className="h-8 w-8 text-primary" />
         <div>
           <h1 className="text-3xl font-bold">Judge Panel</h1>
-          <p className="text-muted-foreground">Welcome, {profile?.full_name}</p>
+          <p className="text-muted-foreground">Score participants in competitions</p>
         </div>
+      </div>
+
+      <div className="mb-6">
+        <Select value={selectedEvent} onChange={(e) => setSelectedEvent(e.target.value)} className="max-w-xs">
+          <option value="">Select event</option>
+          {events.map(ev => <option key={ev.id} value={ev.id}>{ev.name}</option>)}
+        </Select>
       </div>
 
       {competitions.length === 0 ? (
         <Card className="glass-card">
           <CardContent className="py-12 text-center">
             <Gavel className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">No competitions assigned to you yet.</p>
+            <p className="text-muted-foreground">No competitions found for this event.</p>
           </CardContent>
         </Card>
       ) : (
@@ -58,7 +59,6 @@ export default function JudgeHomePage() {
                 <div className="flex items-start justify-between">
                   <div>
                     <CardTitle className="text-lg">{comp.name}</CardTitle>
-                    <p className="text-sm text-muted-foreground">{comp.event_name}</p>
                   </div>
                   <Badge variant={comp.status === "ongoing" ? "warning" : comp.status === "completed" ? "success" : "default"}>
                     {comp.status}

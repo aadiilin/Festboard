@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { createClient } from "@/lib/supabase/client"
-import { useAuth } from "@/hooks/useAuth"
 import { ArrowLeft, CheckCircle2, Save, Send } from "lucide-react"
 import toast from "react-hot-toast"
 import type { Competition, Participant } from "@/types"
@@ -14,11 +13,10 @@ import type { Competition, Participant } from "@/types"
 export default function JudgePanelPage() {
   const params = useParams()
   const router = useRouter()
-  const { user } = useAuth()
   const supabase = createClient()
   const [competition, setCompetition] = useState<Competition | null>(null)
   const [participants, setParticipants] = useState<Participant[]>([])
-  const [scores, setScores] = useState<Record<string, { marks: string; is_draft: boolean; is_approved: boolean }>>({})
+  const [scores, setScores] = useState<Record<string, { marks: string; is_draft: boolean; is_approved: boolean; saved: boolean }>>({})
 
   useEffect(() => {
     loadCompetition()
@@ -35,16 +33,14 @@ export default function JudgePanelPage() {
         .eq("category_id", comp.category_id)
       if (parts) setParticipants(parts)
 
-      // Load existing scores
       const { data: existingScores } = await supabase
         .from("scores")
         .select("*")
         .eq("competition_id", params.competitionId)
-        .eq("judge_id", user?.id)
       if (existingScores) {
-        const scoreMap: Record<string, { marks: string; is_draft: boolean; is_approved: boolean }> = {}
+        const scoreMap: Record<string, { marks: string; is_draft: boolean; is_approved: boolean; saved: boolean }> = {}
         existingScores.forEach((s: { participant_id: string; marks: number; is_draft: boolean; is_approved: boolean }) => {
-          scoreMap[s.participant_id] = { marks: String(s.marks), is_draft: s.is_draft, is_approved: s.is_approved }
+          scoreMap[s.participant_id] = { marks: String(s.marks), is_draft: s.is_draft, is_approved: s.is_approved, saved: true }
         })
         setScores(scoreMap)
       }
@@ -58,14 +54,13 @@ export default function JudgePanelPage() {
     const payload = {
       competition_id: params.competitionId,
       participant_id: participantId,
-      judge_id: user?.id,
       marks: Number(score.marks),
       is_draft: isDraft,
       is_approved: false,
     }
 
     const { error } = await supabase.from("scores").upsert(payload, {
-      onConflict: "competition_id,participant_id,judge_id",
+      onConflict: "competition_id,participant_id",
     })
 
     if (error) toast.error(error.message)
@@ -73,7 +68,7 @@ export default function JudgePanelPage() {
       toast.success(isDraft ? "Draft saved" : "Scores submitted")
       setScores(prev => ({
         ...prev,
-        [participantId]: { ...prev[participantId], is_draft: isDraft },
+        [participantId]: { ...prev[participantId], is_draft: isDraft, saved: true },
       }))
     }
   }
@@ -100,7 +95,6 @@ export default function JudgePanelPage() {
         <div className="space-y-3">
           {participants.map((p) => {
             const score = scores[p.id]
-            const isSubmitted = score && !score.is_draft && !score.is_approved
             const isApproved = score?.is_approved
 
             return (
@@ -121,7 +115,7 @@ export default function JudgePanelPage() {
                       onChange={(e) =>
                         setScores(prev => ({
                           ...prev,
-                          [p.id]: { marks: e.target.value, is_draft: true, is_approved: false },
+                          [p.id]: { marks: e.target.value, is_draft: true, is_approved: false, saved: false },
                         }))
                       }
                       disabled={isApproved}
