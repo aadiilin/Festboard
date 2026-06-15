@@ -11,13 +11,12 @@ import { createClient } from "@/lib/supabase/client"
 import { Plus, Trash2, Search } from "lucide-react"
 import { formatDate, formatTime } from "@/lib/utils"
 import toast from "react-hot-toast"
-import type { Event, Category, Competition, Profile } from "@/types"
+import type { Event, Category, Competition } from "@/types"
 
 export default function CompetitionsPage() {
   const [events, setEvents] = useState<Event[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [competitions, setCompetitions] = useState<Competition[]>([])
-  const [judges, setJudges] = useState<Profile[]>([])
   const [selectedEvent, setSelectedEvent] = useState("")
   const [search, setSearch] = useState("")
   const [open, setOpen] = useState(false)
@@ -36,7 +35,6 @@ export default function CompetitionsPage() {
     if (selectedEvent) {
       supabase.from("categories").select("*").eq("event_id", selectedEvent).then(({ data }) => data && setCategories(data))
       loadCompetitions()
-      supabase.from("profiles").select("*").eq("role", "judge").then(({ data }) => data && setJudges(data))
     }
   }, [selectedEvent])
 

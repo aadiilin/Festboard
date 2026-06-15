@@ -9,7 +9,8 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog"
 import { createClient } from "@/lib/supabase/client"
-import { Plus, Pencil, Trash2, Search } from "lucide-react"
+import { QrCodeCard } from "@/components/qr/QrCodeCard"
+import { Plus, Pencil, Trash2, Search, QrCode } from "lucide-react"
 import { generateChestNumber, getCategoryPrefix } from "@/lib/utils"
 import toast from "react-hot-toast"
 import type { Event, Category, Team, Participant } from "@/types"
@@ -27,6 +28,7 @@ export default function ParticipantsPage() {
   const [search, setSearch] = useState("")
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState<Participant | null>(null)
+  const [qrParticipant, setQrParticipant] = useState<Participant | null>(null)
   const [form, setForm] = useState<ParticipantForm>({ name: "", gender: "male", category_id: "", team_id: "", mobile: "", email: "", address: "" })
   const supabase = createClient()
 
@@ -132,6 +134,19 @@ export default function ParticipantsPage() {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* QR Code Dialog */}
+        <Dialog open={!!qrParticipant} onOpenChange={(o) => { if (!o) setQrParticipant(null) }}>
+          <DialogContent className="max-w-xs">
+            <DialogHeader><DialogTitle>{qrParticipant?.name}</DialogTitle></DialogHeader>
+            {qrParticipant && (
+              <div className="flex flex-col items-center py-4">
+                <QrCodeCard value={qrParticipant.chest_number} size={200} />
+                <p className="text-sm text-muted-foreground mt-2">Chest: {qrParticipant.chest_number}</p>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
 
       <Card className="glass-card">
@@ -153,6 +168,7 @@ export default function ParticipantsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-16">QR</TableHead>
                   <TableHead>Chest #</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Category</TableHead>
@@ -165,6 +181,12 @@ export default function ParticipantsPage() {
               <TableBody>
                 {filtered.map(p => (
                   <TableRow key={p.id}>
+                    <TableCell>
+                      <QrCodeCard value={p.chest_number} size={48} />
+                      <Button variant="ghost" size="icon" className="h-5 w-5 mt-1 mx-auto block" onClick={() => setQrParticipant(p)} title="View larger QR">
+                        <QrCode className="h-3 w-3" />
+                      </Button>
+                    </TableCell>
                     <TableCell className="font-mono font-bold">{p.chest_number}</TableCell>
                     <TableCell className="font-medium">{p.name}</TableCell>
                     <TableCell>{categories.find(c => c.id === p.category_id)?.name}</TableCell>
