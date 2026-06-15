@@ -7,6 +7,7 @@ import { Select } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { createClient } from "@/lib/supabase/client"
 import { CheckCircle2, Clock } from "lucide-react"
+import toast from "react-hot-toast"
 import type { Event, Competition, Score } from "@/types"
 
 export default function ScoresPage() {
@@ -45,8 +46,9 @@ export default function ScoresPage() {
   }
 
   const approveScore = async (id: string) => {
-    await supabase.from("scores").update({ is_draft: false, is_approved: true }).eq("id", id)
-    loadScores()
+    const { error } = await supabase.from("scores").update({ is_draft: false, is_approved: true }).eq("id", id)
+    if (error) toast.error(error.message)
+    else { toast.success("Score approved"); loadScores() }
   }
 
   return (

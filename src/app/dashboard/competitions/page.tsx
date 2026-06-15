@@ -35,23 +35,29 @@ export default function CompetitionsPage() {
   useEffect(() => {
     if (selectedEvent) {
       supabase.from("categories").select("*").eq("event_id", selectedEvent).then(({ data }) => data && setCategories(data))
-      supabase.from("competitions").select("*").eq("event_id", selectedEvent).then(({ data }) => data && setCompetitions(data))
+      loadCompetitions()
       supabase.from("profiles").select("*").eq("role", "judge").then(({ data }) => data && setJudges(data))
     }
   }, [selectedEvent])
+
+  const loadCompetitions = async () => {
+    const { data } = await supabase.from("competitions").select("*").eq("event_id", selectedEvent)
+    if (data) setCompetitions(data)
+  }
 
   const handleSubmit = async () => {
     if (!form.name || !form.category_id || !form.date || !form.time) return toast.error("Fill required fields")
     const payload = { event_id: selectedEvent, ...form, max_marks: Number(form.max_marks) }
     const { error } = await supabase.from("competitions").insert(payload)
     if (error) toast.error(error.message)
-    else { toast.success("Competition created"); setOpen(false); setForm({ name: "", category_id: "", venue: "", date: "", time: "", max_marks: 100, instructions: "", status: "upcoming" }) }
+    else { toast.success("Competition created"); setOpen(false); setForm({ name: "", category_id: "", venue: "", date: "", time: "", max_marks: 100, instructions: "", status: "upcoming" }); loadCompetitions() }
   }
 
   const deleteComp = async (id: string) => {
     if (!confirm("Delete?")) return
-    await supabase.from("competitions").delete().eq("id", id)
-    toast.success("Deleted")
+    const { error } = await supabase.from("competitions").delete().eq("id", id)
+    if (error) toast.error(error.message)
+    else { toast.success("Deleted"); loadCompetitions() }
   }
 
   const statusVariant: Record<Competition["status"], "default" | "success" | "warning"> = { upcoming: "default", ongoing: "warning", completed: "success" }
