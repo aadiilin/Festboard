@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog"
 import { createClient } from "@/lib/supabase/client"
 import { QrCodeCard } from "@/components/qr/QrCodeCard"
-import { Plus, Pencil, Trash2, Search, QrCode } from "lucide-react"
+import { Plus, Pencil, Trash2, Search, QrCode, ExternalLink } from "lucide-react"
 import { generateChestNumber, getCategoryPrefix } from "@/lib/utils"
 import toast from "react-hot-toast"
 import type { Event, Category, Team, Participant } from "@/types"
@@ -195,6 +195,12 @@ export default function ParticipantsPage() {
                     <TableCell>{p.mobile || "-"}</TableCell>
                     <TableCell>
                       <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" title="Copy portal link" onClick={() => {
+                          const url = `${window.location.origin}/candidate?chest=${p.chest_number}`
+                          navigator.clipboard.writeText(url).then(() => toast.success("Portal link copied"))
+                        }}>
+                          <ExternalLink className="h-4 w-4" />
+                        </Button>
                         <Button variant="ghost" size="icon" onClick={() => { setEditing(p); setForm({ name: p.name, gender: p.gender, category_id: p.category_id, team_id: p.team_id || "", mobile: p.mobile || "", email: p.email || "", address: p.address || "" }); setOpen(true) }}>
                           <Pencil className="h-4 w-4" />
                         </Button>

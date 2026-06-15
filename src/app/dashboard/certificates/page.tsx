@@ -7,6 +7,7 @@ import { Select } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { createClient } from "@/lib/supabase/client"
 import { Download, Award } from "lucide-react"
+import { formatDate } from "@/lib/utils"
 import type { Event, Certificate } from "@/types"
 
 export default function CertificatesPage() {
@@ -76,7 +77,7 @@ export default function CertificatesPage() {
                     <TableCell className="font-medium">{c.participant_name}</TableCell>
                     <TableCell>{c.comp_name || "-"}</TableCell>
                     <TableCell><Badge variant={typeVariant[c.type]}>{c.type}</Badge></TableCell>
-                    <TableCell>{new Date(c.issued_at).toLocaleDateString()}</TableCell>
+                    <TableCell>{formatDate(c.issued_at)}</TableCell>
                     <TableCell>
                       <Button variant="outline" size="sm"><Download className="mr-1 h-3 w-3" />PDF</Button>
                     </TableCell>

@@ -36,10 +36,13 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="mt-10 flex items-center justify-center gap-4"
+            className="mt-10 flex items-center justify-center gap-4 flex-wrap"
           >
             <Link href="/dashboard">
               <Button size="lg" className="gradient-primary">Go to Dashboard</Button>
+            </Link>
+            <Link href="/candidate">
+              <Button size="lg" variant="outline">Candidate Portal</Button>
             </Link>
           </motion.div>
         </div>

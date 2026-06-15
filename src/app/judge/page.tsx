@@ -1,86 +1,64 @@
 "use client"
-import { useEffect, useState } from "react"
-import Link from "next/link"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Select } from "@/components/ui/select"
-import { createClient } from "@/lib/supabase/client"
-import { Gavel, ExternalLink } from "lucide-react"
-import type { Event, Competition } from "@/types"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Loader2, Gavel, LogIn } from "lucide-react"
+import toast from "react-hot-toast"
+import { useRouter } from "next/navigation"
 
-export default function JudgeHomePage() {
-  const supabase = createClient()
-  const [events, setEvents] = useState<Event[]>([])
-  const [selectedEvent, setSelectedEvent] = useState("")
-  const [competitions, setCompetitions] = useState<Competition[]>([])
+export default function JudgeLoginPage() {
+  const router = useRouter()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    supabase.from("events").select("*").order("created_at", { ascending: false }).then(({ data }) => {
-      if (data) { setEvents(data); if (data[0]) setSelectedEvent(data[0].id) }
-    })
+    const stored = localStorage.getItem("festboard_judge")
+    if (stored) router.replace("/judge/dashboard")
   }, [])
 
-  useEffect(() => {
-    if (selectedEvent) {
-      supabase.from("competitions").select("*").eq("event_id", selectedEvent).then(({ data }) => data && setCompetitions(data))
-    }
-  }, [selectedEvent])
+  const handleLogin = async () => {
+    if (!email || !password) return toast.error("Email and password are required")
+    setLoading(true)
+    const res = await fetch("/api/judge/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    })
+    const data = await res.json()
+    if (!res.ok) { toast.error(data.error); setLoading(false); return }
+    localStorage.setItem("festboard_judge", JSON.stringify(data.user))
+    toast.success("Welcome back!")
+    router.push("/judge/dashboard")
+  }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">
-      <div className="flex items-center gap-3 mb-6">
-        <Gavel className="h-8 w-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold">Judge Panel</h1>
-          <p className="text-muted-foreground">Score participants in competitions</p>
-        </div>
-      </div>
-
-      <div className="mb-6">
-        <Select value={selectedEvent} onChange={(e) => setSelectedEvent(e.target.value)} className="max-w-xs">
-          <option value="">Select event</option>
-          {events.map(ev => <option key={ev.id} value={ev.id}>{ev.name}</option>)}
-        </Select>
-      </div>
-
-      {competitions.length === 0 ? (
-        <Card className="glass-card">
-          <CardContent className="py-12 text-center">
-            <Gavel className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">No competitions found for this event.</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {competitions.map(comp => (
-            <Card key={comp.id} className="glass-card group">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-lg">{comp.name}</CardTitle>
-                  </div>
-                  <Badge variant={comp.status === "ongoing" ? "warning" : comp.status === "completed" ? "success" : "default"}>
-                    {comp.status}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-sm text-muted-foreground space-y-1 mb-4">
-                  <p>Max marks: {comp.max_marks}</p>
-                  <p>{comp.date} at {comp.time}</p>
-                  {comp.venue && <p>{comp.venue}</p>}
-                </div>
-                <Link href={`/judge/panel/${comp.id}`}>
-                  <Button className="w-full gradient-primary">
-                    <ExternalLink className="mr-2 h-4 w-4" />Open Panel
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
+      <Card className="w-full max-w-md glass-card">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+            <Gavel className="h-7 w-7 text-primary" />
+          </div>
+          <CardTitle className="text-2xl">Judge Login</CardTitle>
+          <p className="text-sm text-muted-foreground mt-1">Sign in to access your scoring dashboard</p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label htmlFor="jemail">Email</Label>
+            <Input id="jemail" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="judge@example.com" />
+          </div>
+          <div>
+            <Label htmlFor="jpass">Password</Label>
+            <Input id="jpass" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter password" />
+          </div>
+          <Button onClick={handleLogin} disabled={loading} className="w-full">
+            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" />}
+            {loading ? "Signing in..." : "Login as Judge"}
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   )
 }

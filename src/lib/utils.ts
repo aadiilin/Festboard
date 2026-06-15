@@ -10,19 +10,25 @@ export function generateChestNumber(categoryPrefix: string, count: number): stri
   return `${categoryPrefix}${num}`;
 }
 
-export function formatDate(date: string | Date) {
+export function formatDate(date: string | Date | null | undefined) {
+  if (!date) return "Date not set"
+  const d = new Date(date)
+  if (isNaN(d.getTime())) return "Date not set"
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
-  }).format(new Date(date));
+  }).format(d)
 }
 
-export function formatTime(date: string | Date) {
+export function formatTime(date: string | Date | null | undefined) {
+  if (!date) return "Time not set"
+  const d = new Date(date)
+  if (isNaN(d.getTime())) return "Time not set"
   return new Intl.DateTimeFormat("en-US", {
     hour: "2-digit",
     minute: "2-digit",
-  }).format(new Date(date));
+  }).format(d)
 }
 
 export function calculatePosition(

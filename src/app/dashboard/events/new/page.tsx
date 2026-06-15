@@ -22,15 +22,22 @@ export default function CreateEventPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    const { error } = await supabase.from("events").insert({
+    const { data, error } = await supabase.from("events").insert({
       name: form.name, organization_name: form.organization_name,
       description: form.description, venue: form.venue,
       start_date: form.start_date, end_date: form.end_date,
       languages: form.languages, status: "draft",
-    })
+    }).select().single()
     setLoading(false)
     if (error) toast.error(error.message)
-    else { toast.success("Event created!"); router.push("/dashboard/events") }
+    else if (data) {
+      toast.success("Event created!")
+      if (window.innerWidth < 768) {
+        router.push(`/dashboard/events/${data.id}`)
+      } else {
+        window.open(`/dashboard/events/${data.id}`, "_blank")
+      }
+    }
   }
 
   return (
