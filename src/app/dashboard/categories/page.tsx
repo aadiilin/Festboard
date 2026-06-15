@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -14,9 +14,9 @@ export default function CategoriesPage() {
   const [events, setEvents] = useState<Event[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [selectedEvent, setSelectedEvent] = useState("")
-  const [newCategory, setNewCategory] = useState("")
   const [adding, setAdding] = useState(false)
   const [loading, setLoading] = useState(true)
+  const inputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
 
   useEffect(() => {
@@ -37,14 +37,16 @@ export default function CategoriesPage() {
   }
 
   const addCategory = async () => {
-    if (!newCategory.trim() || !selectedEvent) return
+    const name = inputRef.current?.value?.trim()
+    if (!name) { toast.error("Enter a category name"); return }
+    if (!selectedEvent) { toast.error("No event selected"); return }
     setAdding(true)
     const { error } = await supabase.from("categories").insert({
-      event_id: selectedEvent, name: newCategory.trim(), display_order: categories.length,
+      event_id: selectedEvent, name, display_order: categories.length,
     })
     setAdding(false)
     if (error) toast.error(error.message)
-    else { setNewCategory(""); loadCategories() }
+    else { if (inputRef.current) inputRef.current.value = ""; toast.success("Added!"); loadCategories() }
   }
 
   const deleteCategory = async (id: string) => {
@@ -71,8 +73,8 @@ export default function CategoriesPage() {
                 <Select value={selectedEvent} onChange={(e) => setSelectedEvent(e.target.value)} className="max-w-xs">
                   {events.map(ev => <option key={ev.id} value={ev.id}>{ev.name}</option>)}
                 </Select>
-                <Input placeholder="Category name" value={newCategory} onChange={(e) => setNewCategory(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addCategory()} />
-                <Button onClick={addCategory} disabled={adding || !newCategory.trim()}>
+                <Input ref={inputRef} placeholder="Category name" onKeyDown={(e) => e.key === "Enter" && addCategory()} />
+                <Button onClick={addCategory} disabled={adding}>
                   {adding ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Plus className="mr-1 h-4 w-4" />}
                   Add
                 </Button>
